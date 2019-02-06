@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 public class MainServer extends Application {
     private TwoWayCommunicationController myController;
     // Change multicastMode to enable multicast
-    public static boolean multicastMode = false;
+    static boolean multicastMode = false;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
