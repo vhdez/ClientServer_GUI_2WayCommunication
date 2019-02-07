@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 public class MainServer extends Application {
     private TwoWayCommunicationController myController;
-    // Change multicastMode to enable multicast
+    // Change multicastMode to enable multi-cast
     static boolean multicastMode = false;
 
     @Override
@@ -20,7 +20,11 @@ public class MainServer extends Application {
         Thread.currentThread().setName("TwoWayCommunicationController MainServer GUI Thread");
 
         // Display the scene
-        primaryStage.setTitle("TwoWayCommunicationController SERVER");
+        if (multicastMode) {
+            primaryStage.setTitle("TwoWayCommunicationController SERVER Multi-cast");
+        } else {
+            primaryStage.setTitle("TwoWayCommunicationController SERVER");
+        }
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
 

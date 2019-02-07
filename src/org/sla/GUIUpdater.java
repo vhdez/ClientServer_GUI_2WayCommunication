@@ -1,18 +1,20 @@
 package org.sla;
 
 import javafx.application.Platform;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
 public class GUIUpdater implements Runnable {
     private SynchronizedQueue inputQueue;
-    private TextField receivedText;
+    private ListView allReceivedText;
     private TextField yourNameText;
 
     // GUIUpdater tries to get data from the Programs inputQueue and updates the GUI when data arrives
 
-    GUIUpdater(SynchronizedQueue q, TextField text, TextField name) {
+    GUIUpdater(SynchronizedQueue q, ListView allTexts, TextField name) {
         inputQueue = q;
-        receivedText = text;
+        allReceivedText = allTexts;
         yourNameText = name;
     }
 
@@ -20,24 +22,17 @@ public class GUIUpdater implements Runnable {
         Thread.currentThread().setName("GUIUpdater Thread");
 
         while (!Thread.interrupted()) {
-            // Try to get 2 strings from the inputQueue
-            String sender = (String)inputQueue.get();
-            while (sender == null) {
-                Thread.currentThread().yield();
-                sender = (String)inputQueue.get();
-            }
-            String finalSender = sender;
-
-            String message = (String)inputQueue.get();
+            // Try to get a Message from the inputQueue
+            Message message = (Message)inputQueue.get();
             while (message == null) {
                 Thread.currentThread().yield();
-                message = (String)inputQueue.get();
+                message = (Message)inputQueue.get();
             }
-            String finalMessage = message;
+            Message finalMessage = message; // needed for Platform.runLater()
 
-            if (!sender.equals(yourNameText.getText())) {
-                // Got a string... update the GUI with it
-                Platform.runLater(() -> receivedText.setText(finalSender + ": " + finalMessage));
+            if (!finalMessage.sender().equals(yourNameText.getText())) {
+                // Got a message from another client... prepend the chat with it
+                Platform.runLater(() -> allReceivedText.getItems().add(0, new Label(finalMessage.sender() + " says \"" + finalMessage.data() + "\"")));
             }
         }
     }
